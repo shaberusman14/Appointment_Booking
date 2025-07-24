@@ -42,4 +42,12 @@ export class AppointmentsController {
   getDoctorAppointments(@Param('id') id: string) {
     return this.appointmentsService.getByDoctor(id);
   }
+  @Post('/bulk-reschedule')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('doctor')
+  bulkReschedule(
+    @Body() dto: { slotId: string; strategy: 'preserve' | 'shift' },
+  ) {
+    return this.appointmentsService.bulkReschedule(dto.slotId, dto.strategy);
+  }
 }

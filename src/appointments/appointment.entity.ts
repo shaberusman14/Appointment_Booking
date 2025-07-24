@@ -1,6 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, BaseEntity } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  BaseEntity,
+} from 'typeorm';
 import { Patient } from '../patients/patient.entity';
 import { Slot } from '../slots/slot.entity';
+
+export enum AppointmentStatus {
+  SCHEDULED = 'scheduled',
+  CANCELLED = 'cancelled',
+  RESCHEDULED = 'rescheduled',
+  IMPACTED = 'impacted',
+}
 
 @Entity('appointments')
 export class Appointment extends BaseEntity {
@@ -16,9 +30,10 @@ export class Appointment extends BaseEntity {
   @Column()
   reason: string;
 
-  @Column({ default: 'scheduled' })
-  status: 'scheduled' | 'cancelled' | 'rescheduled';
+  @Column({ type: 'enum', enum: AppointmentStatus, default: AppointmentStatus.SCHEDULED })
+  status: AppointmentStatus;
 
   @CreateDateColumn()
   createdAt: Date;
 }
+

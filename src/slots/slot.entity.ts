@@ -1,6 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  BaseEntity,
+} from 'typeorm';
 import { Doctor } from '../doctors/doctor.entity';
 import { Appointment } from '../appointments/appointment.entity';
+
+export enum SlotMode {
+  STREAM = 'stream',
+  WAVE = 'wave',
+  ELASTIC = 'elastic',
+}
 
 @Entity('slots')
 export class Slot extends BaseEntity {
@@ -8,19 +21,28 @@ export class Slot extends BaseEntity {
   id: string;
 
   @Column()
-  date: string; // Format: YYYY-MM-DD
+  date: string;
 
   @Column()
-  startTime: string; // Format: HH:MM
+  startTime: string;
 
   @Column()
-  endTime: string; // Format: HH:MM
+  endTime: string;
 
-  @Column({ type: 'enum', enum: ['wave', 'stream'] })
-  mode: 'wave' | 'stream';
+  @Column({ type: 'enum', enum: SlotMode, default: SlotMode.STREAM })
+  mode: SlotMode;
 
   @Column({ nullable: true })
   maxBookings: number;
+
+  @Column({ nullable: true, type: 'integer' })
+  slotDuration?: number;
+
+  @Column({ nullable: true })
+  originalStartTime?: string;
+
+  @Column({ nullable: true })
+  originalEndTime?: string;
 
   @ManyToOne(() => Doctor, (doctor) => doctor.slots)
   doctor: Doctor;

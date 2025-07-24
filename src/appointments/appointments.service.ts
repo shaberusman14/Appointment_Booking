@@ -4,6 +4,8 @@ import { Appointment } from './appointment.entity';
 import { Repository } from 'typeorm';
 import { Slot } from '../slots/slot.entity';
 import { Patient } from '../patients/patient.entity';
+import { BadRequestException,NotFoundException } from '@nestjs/common';
+import { AppointmentStatus } from './appointment.entity';
 
 @Injectable()
 export class AppointmentsService {
@@ -36,7 +38,7 @@ export class AppointmentsService {
     if (!newSlot) throw new ConflictException('Slot not found');
     // Stream/Wave check omitted for brevity
     appt.slot = newSlot;
-    appt.status = 'rescheduled';
+    appt.status = AppointmentStatus.RESCHEDULED;
     return this.apptRepo.save(appt);
   }
 
@@ -56,5 +58,31 @@ export class AppointmentsService {
       .leftJoinAndSelect('slot.doctor', 'doctor')
       .where('doctor.id = :doctorId', { doctorId })
       .getMany();
+  }
+
+    async bulkReschedule(slotId: string, strategy: 'preserve' | 'shift') {
+    const impactedAppointments = await this.apptRepo.find({
+      where: { slot: { id: slotId }, status: AppointmentStatus.IMPACTED },
+      relations: ['patient', 'slot'],
+    });
+
+    if (!impactedAppointments.length) {
+      throw new NotFoundException('No impacted appointments found');
+    }
+
+    const targetSlot = await this.slotRepo.findOne({ where: { id: slotId } });
+    if (!targetSlot) {
+      throw new NotFoundException('Target slot not found');
+    }
+
+    for (const appt of impactedAppointments) {
+      appt.status = AppointmentStatus.RESCHEDULED;
+      await this.apptRepo.save(appt);
+    }
+
+    return {
+      rescheduledCount: impactedAppointments.length,
+      strategy,
+    };
   }
 }
