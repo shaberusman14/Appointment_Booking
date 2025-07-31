@@ -27,7 +27,7 @@ export class SlotsController {
     return this.slotsService.deleteSlot(slotId);
   }
 
-//es
+//Eslastic Slot
     @Patch(':slotId/update-time-window')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('doctor')
@@ -55,4 +55,6 @@ export class SlotsController {
   getAffectedAppointments(@Param('slotId') slotId: string) {
     return this.slotsService.getAffectedAppointments(slotId);
   }
+
+
 }

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Slot } from './slot.entity';
 import { Repository } from 'typeorm';
 import { Appointment, AppointmentStatus } from '../appointments/appointment.entity';
-import { SlotAdjustmentLog } from './slot-adjustment-log.entity';
+import { SlotAdjustmentAction, SlotAdjustmentLog } from './slot-adjustment-log.entity';
 import { BadRequestException } from '@nestjs/common';
 import { SlotMode } from './slot.entity';
 
@@ -61,7 +61,7 @@ export class SlotsService {
       this.adjustmentLogRepo.create({
         slotId,
         doctorId,
-        action: 'update-time-window',
+        action: SlotAdjustmentAction.UPDATE_TIME_WINDOW,
         changeDetails: dto,
       }),
     );
@@ -85,7 +85,7 @@ export class SlotsService {
       this.adjustmentLogRepo.create({
         slotId,
         doctorId,
-        action: 'update-slot-duration',
+        action: SlotAdjustmentAction.UPDATE_SLOT_DURATION,
         changeDetails: dto,
       }),
     );
@@ -99,5 +99,8 @@ export class SlotsService {
       relations: ['patient', 'slot'],
     });
   }
+
+
+
 }
 

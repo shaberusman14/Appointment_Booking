@@ -14,6 +14,9 @@ export enum AppointmentStatus {
   CANCELLED = 'cancelled',
   RESCHEDULED = 'rescheduled',
   IMPACTED = 'impacted',
+    ARRIVED = 'arrived',    // newly added
+  LATE = 'late',          
+  NO_SHOW = 'no-show',
 }
 
 @Entity('appointments')
@@ -35,5 +38,11 @@ export class Appointment extends BaseEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column({ nullable: true })
+  reportingTime?: string; // NEW: Reporting/arrival time, e.g. '09:45' for a 10:00 slot
+  
+  @Column({ type: 'timestamp', nullable: true })
+arrivalTime?: Date;
 }
 

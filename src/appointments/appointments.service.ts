@@ -60,6 +60,38 @@ export class AppointmentsService {
       .getMany();
   }
 
+
+  async updateReportingTime(apptId: string, reportingTime: string): Promise<Appointment> {
+    const appt = await this.apptRepo.findOne({ where: { id: apptId } });
+    if (!appt) throw new NotFoundException('Appointment not found');
+    appt.reportingTime = reportingTime;
+    return await this.apptRepo.save(appt);
+  }
+
+async updateArrivalStatus(
+  apptId: string,
+  status: 'arrived' | 'late' | 'no-show',
+  arrivalTime?: string,  // ISO datetime string
+): Promise<Appointment> {
+  const appt = await this.apptRepo.findOne({ where: { id: apptId } });
+  if (!appt) throw new NotFoundException('Appointment not found');
+
+  if (![AppointmentStatus.ARRIVED, AppointmentStatus.LATE, AppointmentStatus.NO_SHOW].includes(status as any)) {
+    throw new BadRequestException('Invalid arrival status');
+  }
+
+  appt.status = status as AppointmentStatus;
+  if (arrivalTime) {
+    appt.arrivalTime = new Date(arrivalTime);
+  } else if (status === AppointmentStatus.ARRIVED) {
+    // If no arrivalTime provided but status arrived, set current time
+    appt.arrivalTime = new Date();
+  }
+
+  return await this.apptRepo.save(appt);
+}
+
+
     async bulkReschedule(slotId: string, strategy: 'preserve' | 'shift') {
     const impactedAppointments = await this.apptRepo.find({
       where: { slot: { id: slotId }, status: AppointmentStatus.IMPACTED },

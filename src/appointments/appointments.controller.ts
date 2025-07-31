@@ -42,6 +42,28 @@ export class AppointmentsController {
   getDoctorAppointments(@Param('id') id: string) {
     return this.appointmentsService.getByDoctor(id);
   }
+  
+ @Patch(':id/reporting-time')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('doctor')
+  updateReportingTime(
+    @Param('id') apptId: string,
+    @Body() dto: { reportingTime: string }
+  ) {
+    return this.appointmentsService.updateReportingTime(apptId, dto.reportingTime);
+  }
+
+
+@Patch(':id/arrival-status')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('doctor')
+async updateArrivalStatus(
+  @Param('id') apptId: string,
+  @Body() dto: { status: 'arrived' | 'late' | 'no-show'; arrivalTime?: string },
+) {
+  return this.appointmentsService.updateArrivalStatus(apptId, dto.status, dto.arrivalTime);
+}
+
   @Post('/bulk-reschedule')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('doctor')

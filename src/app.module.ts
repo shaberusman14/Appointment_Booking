@@ -14,6 +14,8 @@ import { Doctor } from './doctors/doctor.entity';
 import { Patient } from './patients/patient.entity';
 import { Slot } from './slots/slot.entity';
 import { Appointment } from './appointments/appointment.entity';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { SlotAdjustmentLog } from './slots/slot-adjustment-log.entity';
 
 @Module({
   imports: [
@@ -30,7 +32,7 @@ import { Appointment } from './appointments/appointment.entity';
       database: process.env.DB_NAME,
       synchronize: false,
       autoLoadEntities: true,
-      entities: [User, Doctor, Patient, Slot, Appointment],
+      entities: [User, Doctor, Patient, Slot, Appointment,SlotAdjustmentLog],
       logging: true,
     }),
 
@@ -40,6 +42,7 @@ import { Appointment } from './appointments/appointment.entity';
     PatientsModule,
     SlotsModule,
     AppointmentsModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}
